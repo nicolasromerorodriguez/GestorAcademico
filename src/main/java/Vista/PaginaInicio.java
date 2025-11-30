@@ -3,10 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Vista;
+
 import javax.swing.*;
 import java.awt.*;
 import Controlador.Controladora;
-import Modelo.Token;  // Importa tu entidad según el paquete real
+import Modelo.Token;
 
 public class PaginaInicio extends JFrame {
 
@@ -14,6 +15,7 @@ public class PaginaInicio extends JFrame {
     private JPasswordField txtPassword;
     private JComboBox<String> comboRol;
     private JButton btnLogin;
+    private JButton btnPreinscripcion;
 
     private Controladora control;
 
@@ -21,7 +23,7 @@ public class PaginaInicio extends JFrame {
         this.control = control;
 
         setTitle("Sistema de Login");
-        setSize(400, 260);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -52,10 +54,10 @@ public class PaginaInicio extends JFrame {
         panel.add(new JLabel("Rol:"), gbc);
 
         comboRol = new JComboBox<>(new String[]{
-            "1",
-            "2",
-            "3",
-            "4"
+                "1",
+                "2",
+                "3",
+                "4"
         });
         gbc.gridx = 1; gbc.gridy = 2;
         panel.add(comboRol, gbc);
@@ -66,10 +68,16 @@ public class PaginaInicio extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(btnLogin, gbc);
 
+        // Botón Preinscripción sin login
+        btnPreinscripcion = new JButton("Preinscripción");
+        gbc.gridx = 1; gbc.gridy = 4;
+        panel.add(btnPreinscripcion, gbc);
+
         add(panel);
 
-        // Acción del botón
+        // LISTENERS
         btnLogin.addActionListener(e -> iniciarSesion());
+        btnPreinscripcion.addActionListener(e -> abrirFormularioPreinscripcion());
     }
 
     private void iniciarSesion() {
@@ -82,7 +90,6 @@ public class PaginaInicio extends JFrame {
             return;
         }
 
-        // Uso de la controladora
         Token token = control.validarLogin(usuario, contrasena, rolSeleccionado);
 
         if (token == null) {
@@ -91,7 +98,6 @@ public class PaginaInicio extends JFrame {
         }
 
         JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso");
-
         abrirVentanaPrincipal();
         this.dispose();
     }
@@ -103,7 +109,13 @@ public class PaginaInicio extends JFrame {
         ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         ventana.add(new JLabel("Sesión iniciada correctamente", SwingConstants.CENTER));
-
         ventana.setVisible(true);
     }
+
+    private void abrirFormularioPreinscripcion() {
+        FormularioPreinscripcion form = new FormularioPreinscripcion(control);
+        form.setVisible(true);
+        this.dispose();
+    }
+
 }

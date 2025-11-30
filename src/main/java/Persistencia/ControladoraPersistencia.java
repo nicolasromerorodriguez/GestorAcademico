@@ -6,6 +6,7 @@ package Persistencia;
 
 import Modelo.Acudiente;
 import Modelo.Direccion;
+import Modelo.Preinscripcion;
 import Modelo.Profesor;
 import Modelo.Rol;
 import Modelo.SuperUsuario;
@@ -260,5 +261,14 @@ public void habilitarUsuario(String id) {
     }
 }
 
+//-----------------------------Preinscripcoon-----------------
+
+public void crearPreinscripcion(Preinscripcion pre) {
+    try {
+        preinscripcionJpa.create(pre);
+    } catch (Exception e) {
+        throw new RuntimeException("Error guardando Preinscripción en la BD", e);
+    }
+}
 
 }

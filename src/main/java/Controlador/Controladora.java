@@ -6,6 +6,7 @@ package Controlador;
 
 import Modelo.Acudiente;
 import Modelo.Direccion;
+import Modelo.Preinscripcion;
 import Modelo.Profesor;
 import Modelo.Rol;
 import Modelo.SuperUsuario;
@@ -177,6 +178,12 @@ public void deshabilitarUsuario(String id) {
 //-----------------------------Habilitar--------------------------
 public void habilitarUsuario(String id) {
     controlPersis.habilitarUsuario(id);
+}
+
+
+//--------------------------------------------------------Preincripcion--------------------------------------
+public void crearPreinscripcion(Preinscripcion pre){
+    controlPersis.crearPreinscripcion(pre);
 }
 
 

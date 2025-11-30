@@ -14,6 +14,7 @@ import Vista.FrmSuperUsuarioInicio;
 import Vista.PaginaInicio;
 import java.util.ArrayList;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  *
@@ -24,6 +25,15 @@ public class Colegio1 {
     public static void main(String[] args) {
         //ControladoraPersistencia controlPersist =new ControladoraPersistencia();
         Controladora control = new Controladora();
+        
+       
+
+        // Luego creas la vista y le pasas la controladora:
+        PaginaInicio inicio = new PaginaInicio(control);
+
+        // Muestras la ventana:
+        inicio.setVisible(true);
+    
         
         //Token token = new Token("1", "Usuario1", "Administracion", "12345");
         //control.crearToken(token);
@@ -69,14 +79,13 @@ public class Colegio1 {
         
         
         
+        
+        
         //Guardar Rol en BD
         
         
         //Vista
-        /*SwingUtilities.invokeLater(() -> {
-            new PaginaInicio(control).setVisible(true);
-        });*/
-        
+       
         
         //Temporal para crear usuario
         
@@ -85,12 +94,15 @@ public class Colegio1 {
             FrmSuperUsuarioInicio frm = new FrmSuperUsuarioInicio();
             frm.setVisible(true);
         });*/
-        
+        /*
         java.awt.EventQueue.invokeLater(new Runnable() {
         public void run() {
             new FrmMostrarUsuarios().setVisible(true);
-        }
-    });
+        } 
+    }); 
+        */
+     
+        
         
         
     }
