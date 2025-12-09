@@ -4,18 +4,15 @@
  */
 package Modelo;
 
-import javax.persistence.Entity;
-
 /**
  *
  * @author nicol
  */
-@Entity
-public class Profesor extends Usuario {
+public class Curso {
+    private int id;
+    private int capacidad;
+    private boolean estado;
+    private String nombre;
+    private Profesor profesor;
     
-    
-    
-    public Profesor(){
-        
-    }
 }

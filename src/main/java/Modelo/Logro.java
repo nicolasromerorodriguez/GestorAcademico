@@ -4,18 +4,14 @@
  */
 package Modelo;
 
-import javax.persistence.Entity;
+import java.util.Date;
 
 /**
  *
  * @author nicol
  */
-@Entity
-public class Profesor extends Usuario {
-    
-    
-    
-    public Profesor(){
-        
-    }
+public class Logro {
+    private int id;
+    private String nombre;
+    private Date fechaCreacion;
 }

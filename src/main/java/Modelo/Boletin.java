@@ -4,18 +4,16 @@
  */
 package Modelo;
 
-import javax.persistence.Entity;
+import java.util.ArrayList;
 
 /**
  *
  * @author nicol
  */
-@Entity
-public class Profesor extends Usuario {
+public class Boletin {
+    private int id;
+    private ArrayList<CategoriaLogro> categoriaLogro;;
+    private HistoriaAcademica historiaAcademica;
     
     
-    
-    public Profesor(){
-        
-    }
 }
