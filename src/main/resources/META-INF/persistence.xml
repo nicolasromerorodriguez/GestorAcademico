@@ -12,6 +12,13 @@
     <class>Modelo.Preinscripcion</class>
     <class>Modelo.Estudiante</class>
     <class>Modelo.HistoriaAcademica</class>
+    <class>Modelo.Boletin</class>
+    <class>Modelo.CategoriaLogro</class>
+    <class>Modelo.Curso</class>
+    <class>Modelo.Grado</class>
+    <class>Modelo.HojaDeVida</class>
+    <class>Modelo.Logro</class>
+    <class>Modelo.Observador</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/colegio1"/>
       <property name="javax.persistence.jdbc.user" value="postgres"/>

@@ -4,17 +4,19 @@
  */
 package Persistencia;
 
+import java.io.Serializable;
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import Modelo.Boletin;
 import Modelo.HistoriaAcademica;
 import Persistencia.exceptions.NonexistentEntityException;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 /**
  *
@@ -29,6 +31,7 @@ public class HistoriaAcademicaJpaController implements Serializable {
     public HistoriaAcademicaJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -36,11 +39,29 @@ public class HistoriaAcademicaJpaController implements Serializable {
     }
 
     public void create(HistoriaAcademica historiaAcademica) {
+        if (historiaAcademica.getListaBoletines() == null) {
+            historiaAcademica.setListaBoletines(new ArrayList<Boletin>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            ArrayList<Boletin> attachedListaBoletines = new ArrayList<Boletin>();
+            for (Boletin listaBoletinesBoletinToAttach : historiaAcademica.getListaBoletines()) {
+                listaBoletinesBoletinToAttach = em.getReference(listaBoletinesBoletinToAttach.getClass(), listaBoletinesBoletinToAttach.getId());
+                attachedListaBoletines.add(listaBoletinesBoletinToAttach);
+            }
+            historiaAcademica.setListaBoletines(attachedListaBoletines);
             em.persist(historiaAcademica);
+            for (Boletin listaBoletinesBoletin : historiaAcademica.getListaBoletines()) {
+                HistoriaAcademica oldHistoriaAcademicaOfListaBoletinesBoletin = listaBoletinesBoletin.getHistoriaAcademica();
+                listaBoletinesBoletin.setHistoriaAcademica(historiaAcademica);
+                listaBoletinesBoletin = em.merge(listaBoletinesBoletin);
+                if (oldHistoriaAcademicaOfListaBoletinesBoletin != null) {
+                    oldHistoriaAcademicaOfListaBoletinesBoletin.getListaBoletines().remove(listaBoletinesBoletin);
+                    oldHistoriaAcademicaOfListaBoletinesBoletin = em.merge(oldHistoriaAcademicaOfListaBoletinesBoletin);
+                }
+            }
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -54,7 +75,34 @@ public class HistoriaAcademicaJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            HistoriaAcademica persistentHistoriaAcademica = em.find(HistoriaAcademica.class, historiaAcademica.getId());
+            ArrayList<Boletin> listaBoletinesOld = persistentHistoriaAcademica.getListaBoletines();
+            ArrayList<Boletin> listaBoletinesNew = historiaAcademica.getListaBoletines();
+            ArrayList<Boletin> attachedListaBoletinesNew = new ArrayList<Boletin>();
+            for (Boletin listaBoletinesNewBoletinToAttach : listaBoletinesNew) {
+                listaBoletinesNewBoletinToAttach = em.getReference(listaBoletinesNewBoletinToAttach.getClass(), listaBoletinesNewBoletinToAttach.getId());
+                attachedListaBoletinesNew.add(listaBoletinesNewBoletinToAttach);
+            }
+            listaBoletinesNew = attachedListaBoletinesNew;
+            historiaAcademica.setListaBoletines(listaBoletinesNew);
             historiaAcademica = em.merge(historiaAcademica);
+            for (Boletin listaBoletinesOldBoletin : listaBoletinesOld) {
+                if (!listaBoletinesNew.contains(listaBoletinesOldBoletin)) {
+                    listaBoletinesOldBoletin.setHistoriaAcademica(null);
+                    listaBoletinesOldBoletin = em.merge(listaBoletinesOldBoletin);
+                }
+            }
+            for (Boletin listaBoletinesNewBoletin : listaBoletinesNew) {
+                if (!listaBoletinesOld.contains(listaBoletinesNewBoletin)) {
+                    HistoriaAcademica oldHistoriaAcademicaOfListaBoletinesNewBoletin = listaBoletinesNewBoletin.getHistoriaAcademica();
+                    listaBoletinesNewBoletin.setHistoriaAcademica(historiaAcademica);
+                    listaBoletinesNewBoletin = em.merge(listaBoletinesNewBoletin);
+                    if (oldHistoriaAcademicaOfListaBoletinesNewBoletin != null && !oldHistoriaAcademicaOfListaBoletinesNewBoletin.equals(historiaAcademica)) {
+                        oldHistoriaAcademicaOfListaBoletinesNewBoletin.getListaBoletines().remove(listaBoletinesNewBoletin);
+                        oldHistoriaAcademicaOfListaBoletinesNewBoletin = em.merge(oldHistoriaAcademicaOfListaBoletinesNewBoletin);
+                    }
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -83,6 +131,11 @@ public class HistoriaAcademicaJpaController implements Serializable {
                 historiaAcademica.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The historiaAcademica with id " + id + " no longer exists.", enfe);
+            }
+            ArrayList<Boletin> listaBoletines = historiaAcademica.getListaBoletines();
+            for (Boletin listaBoletinesBoletin : listaBoletines) {
+                listaBoletinesBoletin.setHistoriaAcademica(null);
+                listaBoletinesBoletin = em.merge(listaBoletinesBoletin);
             }
             em.remove(historiaAcademica);
             em.getTransaction().commit();

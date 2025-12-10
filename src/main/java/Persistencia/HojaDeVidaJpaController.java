@@ -4,9 +4,8 @@
  */
 package Persistencia;
 
-import Modelo.Direccion;
+import Modelo.HojaDeVida;
 import Persistencia.exceptions.NonexistentEntityException;
-import Persistencia.exceptions.PreexistingEntityException;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -21,33 +20,29 @@ import javax.persistence.criteria.Root;
  *
  * @author nicol
  */
-public class DireccionJpaController implements Serializable {
+public class HojaDeVidaJpaController implements Serializable {
 
-    public DireccionJpaController(EntityManagerFactory emf) {
+    public HojaDeVidaJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     
-    public DireccionJpaController() {
+    public HojaDeVidaJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
-    public void create(Direccion direccion) throws PreexistingEntityException, Exception {
+    public void create(HojaDeVida hojaDeVida) {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(direccion);
+            em.persist(hojaDeVida);
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findDireccion(direccion.getId()) != null) {
-                throw new PreexistingEntityException("Direccion " + direccion + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
@@ -55,19 +50,19 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public void edit(Direccion direccion) throws NonexistentEntityException, Exception {
+    public void edit(HojaDeVida hojaDeVida) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            direccion = em.merge(direccion);
+            hojaDeVida = em.merge(hojaDeVida);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = direccion.getId();
-                if (findDireccion(id) == null) {
-                    throw new NonexistentEntityException("The direccion with id " + id + " no longer exists.");
+                int id = hojaDeVida.getId();
+                if (findHojaDeVida(id) == null) {
+                    throw new NonexistentEntityException("The hojaDeVida with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -78,19 +73,19 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public void destroy(String id) throws NonexistentEntityException {
+    public void destroy(int id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Direccion direccion;
+            HojaDeVida hojaDeVida;
             try {
-                direccion = em.getReference(Direccion.class, id);
-                direccion.getId();
+                hojaDeVida = em.getReference(HojaDeVida.class, id);
+                hojaDeVida.getId();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The direccion with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("The hojaDeVida with id " + id + " no longer exists.", enfe);
             }
-            em.remove(direccion);
+            em.remove(hojaDeVida);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -99,19 +94,19 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public List<Direccion> findDireccionEntities() {
-        return findDireccionEntities(true, -1, -1);
+    public List<HojaDeVida> findHojaDeVidaEntities() {
+        return findHojaDeVidaEntities(true, -1, -1);
     }
 
-    public List<Direccion> findDireccionEntities(int maxResults, int firstResult) {
-        return findDireccionEntities(false, maxResults, firstResult);
+    public List<HojaDeVida> findHojaDeVidaEntities(int maxResults, int firstResult) {
+        return findHojaDeVidaEntities(false, maxResults, firstResult);
     }
 
-    private List<Direccion> findDireccionEntities(boolean all, int maxResults, int firstResult) {
+    private List<HojaDeVida> findHojaDeVidaEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Direccion.class));
+            cq.select(cq.from(HojaDeVida.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -123,20 +118,20 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public Direccion findDireccion(String id) {
+    public HojaDeVida findHojaDeVida(int id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Direccion.class, id);
+            return em.find(HojaDeVida.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getDireccionCount() {
+    public int getHojaDeVidaCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Direccion> rt = cq.from(Direccion.class);
+            Root<HojaDeVida> rt = cq.from(HojaDeVida.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

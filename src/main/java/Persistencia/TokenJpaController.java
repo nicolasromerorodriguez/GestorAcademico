@@ -4,18 +4,19 @@
  */
 package Persistencia;
 
+import java.io.Serializable;
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import Modelo.Rol;
 import Modelo.Token;
 import Persistencia.exceptions.NonexistentEntityException;
 import Persistencia.exceptions.PreexistingEntityException;
-import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 /**
  *
@@ -30,6 +31,7 @@ public class TokenJpaController implements Serializable {
     public TokenJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -41,7 +43,16 @@ public class TokenJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Rol rol = token.getRol();
+            if (rol != null) {
+                rol = em.getReference(rol.getClass(), rol.getId());
+                token.setRol(rol);
+            }
             em.persist(token);
+            if (rol != null) {
+                rol.getListaTokens().add(token);
+                rol = em.merge(rol);
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findToken(token.getId()) != null) {
@@ -60,7 +71,22 @@ public class TokenJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Token persistentToken = em.find(Token.class, token.getId());
+            Rol rolOld = persistentToken.getRol();
+            Rol rolNew = token.getRol();
+            if (rolNew != null) {
+                rolNew = em.getReference(rolNew.getClass(), rolNew.getId());
+                token.setRol(rolNew);
+            }
             token = em.merge(token);
+            if (rolOld != null && !rolOld.equals(rolNew)) {
+                rolOld.getListaTokens().remove(token);
+                rolOld = em.merge(rolOld);
+            }
+            if (rolNew != null && !rolNew.equals(rolOld)) {
+                rolNew.getListaTokens().add(token);
+                rolNew = em.merge(rolNew);
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -89,6 +115,11 @@ public class TokenJpaController implements Serializable {
                 token.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The token with id " + id + " no longer exists.", enfe);
+            }
+            Rol rol = token.getRol();
+            if (rol != null) {
+                rol.getListaTokens().remove(token);
+                rol = em.merge(rol);
             }
             em.remove(token);
             em.getTransaction().commit();

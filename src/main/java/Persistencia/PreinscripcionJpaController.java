@@ -30,6 +30,7 @@ public class PreinscripcionJpaController implements Serializable {
     public PreinscripcionJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {

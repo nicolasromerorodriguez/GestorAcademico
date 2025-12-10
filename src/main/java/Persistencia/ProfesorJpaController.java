@@ -4,18 +4,19 @@
  */
 package Persistencia;
 
+import java.io.Serializable;
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import Modelo.Curso;
 import Modelo.Profesor;
 import Persistencia.exceptions.NonexistentEntityException;
 import Persistencia.exceptions.PreexistingEntityException;
-import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 /**
  *
@@ -27,9 +28,10 @@ public class ProfesorJpaController implements Serializable {
         this.emf = emf;
     }
     
-    public ProfesorJpaController(){
+    public ProfesorJpaController() {
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+    
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -41,7 +43,16 @@ public class ProfesorJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Curso curso = profesor.getCurso();
+            if (curso != null) {
+                curso = em.getReference(curso.getClass(), curso.getId());
+                profesor.setCurso(curso);
+            }
             em.persist(profesor);
+            if (curso != null) {
+                curso.getProfesor().add(profesor);
+                curso = em.merge(curso);
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findProfesor(profesor.getId()) != null) {
@@ -60,7 +71,22 @@ public class ProfesorJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Profesor persistentProfesor = em.find(Profesor.class, profesor.getId());
+            Curso cursoOld = persistentProfesor.getCurso();
+            Curso cursoNew = profesor.getCurso();
+            if (cursoNew != null) {
+                cursoNew = em.getReference(cursoNew.getClass(), cursoNew.getId());
+                profesor.setCurso(cursoNew);
+            }
             profesor = em.merge(profesor);
+            if (cursoOld != null && !cursoOld.equals(cursoNew)) {
+                cursoOld.getProfesor().remove(profesor);
+                cursoOld = em.merge(cursoOld);
+            }
+            if (cursoNew != null && !cursoNew.equals(cursoOld)) {
+                cursoNew.getProfesor().add(profesor);
+                cursoNew = em.merge(cursoNew);
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -89,6 +115,11 @@ public class ProfesorJpaController implements Serializable {
                 profesor.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The profesor with id " + id + " no longer exists.", enfe);
+            }
+            Curso curso = profesor.getCurso();
+            if (curso != null) {
+                curso.getProfesor().remove(profesor);
+                curso = em.merge(curso);
             }
             em.remove(profesor);
             em.getTransaction().commit();

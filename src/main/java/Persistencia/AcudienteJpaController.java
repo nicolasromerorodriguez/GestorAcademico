@@ -30,7 +30,7 @@ public class AcudienteJpaController implements Serializable {
         this.emf = emf;
     }
     
-    public AcudienteJpaController(){
+    public AcudienteJpaController() {
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
     private EntityManagerFactory emf = null;

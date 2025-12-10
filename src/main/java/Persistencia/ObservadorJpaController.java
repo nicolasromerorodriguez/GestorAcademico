@@ -4,9 +4,8 @@
  */
 package Persistencia;
 
-import Modelo.Direccion;
+import Modelo.Observador;
 import Persistencia.exceptions.NonexistentEntityException;
-import Persistencia.exceptions.PreexistingEntityException;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -21,33 +20,29 @@ import javax.persistence.criteria.Root;
  *
  * @author nicol
  */
-public class DireccionJpaController implements Serializable {
+public class ObservadorJpaController implements Serializable {
 
-    public DireccionJpaController(EntityManagerFactory emf) {
+    public ObservadorJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
     
-    public DireccionJpaController() {
+    public ObservadorJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
-    public void create(Direccion direccion) throws PreexistingEntityException, Exception {
+    public void create(Observador observador) {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(direccion);
+            em.persist(observador);
             em.getTransaction().commit();
-        } catch (Exception ex) {
-            if (findDireccion(direccion.getId()) != null) {
-                throw new PreexistingEntityException("Direccion " + direccion + " already exists.", ex);
-            }
-            throw ex;
         } finally {
             if (em != null) {
                 em.close();
@@ -55,19 +50,19 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public void edit(Direccion direccion) throws NonexistentEntityException, Exception {
+    public void edit(Observador observador) throws NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            direccion = em.merge(direccion);
+            observador = em.merge(observador);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = direccion.getId();
-                if (findDireccion(id) == null) {
-                    throw new NonexistentEntityException("The direccion with id " + id + " no longer exists.");
+                int id = observador.getId();
+                if (findObservador(id) == null) {
+                    throw new NonexistentEntityException("The observador with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -78,19 +73,19 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public void destroy(String id) throws NonexistentEntityException {
+    public void destroy(int id) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Direccion direccion;
+            Observador observador;
             try {
-                direccion = em.getReference(Direccion.class, id);
-                direccion.getId();
+                observador = em.getReference(Observador.class, id);
+                observador.getId();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The direccion with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("The observador with id " + id + " no longer exists.", enfe);
             }
-            em.remove(direccion);
+            em.remove(observador);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -99,19 +94,19 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public List<Direccion> findDireccionEntities() {
-        return findDireccionEntities(true, -1, -1);
+    public List<Observador> findObservadorEntities() {
+        return findObservadorEntities(true, -1, -1);
     }
 
-    public List<Direccion> findDireccionEntities(int maxResults, int firstResult) {
-        return findDireccionEntities(false, maxResults, firstResult);
+    public List<Observador> findObservadorEntities(int maxResults, int firstResult) {
+        return findObservadorEntities(false, maxResults, firstResult);
     }
 
-    private List<Direccion> findDireccionEntities(boolean all, int maxResults, int firstResult) {
+    private List<Observador> findObservadorEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Direccion.class));
+            cq.select(cq.from(Observador.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -123,20 +118,20 @@ public class DireccionJpaController implements Serializable {
         }
     }
 
-    public Direccion findDireccion(String id) {
+    public Observador findObservador(int id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Direccion.class, id);
+            return em.find(Observador.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getDireccionCount() {
+    public int getObservadorCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Direccion> rt = cq.from(Direccion.class);
+            Root<Observador> rt = cq.from(Observador.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

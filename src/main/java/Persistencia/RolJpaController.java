@@ -5,16 +5,18 @@
 package Persistencia;
 
 import Modelo.Rol;
-import Persistencia.exceptions.NonexistentEntityException;
 import java.io.Serializable;
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import Modelo.Token;
+import Persistencia.exceptions.NonexistentEntityException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 /**
  *
@@ -29,6 +31,7 @@ public class RolJpaController implements Serializable {
     public RolJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -36,11 +39,29 @@ public class RolJpaController implements Serializable {
     }
 
     public void create(Rol rol) {
+        if (rol.getListaTokens() == null) {
+            rol.setListaTokens(new ArrayList<Token>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            ArrayList<Token> attachedListaTokens = new ArrayList<Token>();
+            for (Token listaTokensTokenToAttach : rol.getListaTokens()) {
+                listaTokensTokenToAttach = em.getReference(listaTokensTokenToAttach.getClass(), listaTokensTokenToAttach.getId());
+                attachedListaTokens.add(listaTokensTokenToAttach);
+            }
+            rol.setListaTokens(attachedListaTokens);
             em.persist(rol);
+            for (Token listaTokensToken : rol.getListaTokens()) {
+                Rol oldRolOfListaTokensToken = listaTokensToken.getRol();
+                listaTokensToken.setRol(rol);
+                listaTokensToken = em.merge(listaTokensToken);
+                if (oldRolOfListaTokensToken != null) {
+                    oldRolOfListaTokensToken.getListaTokens().remove(listaTokensToken);
+                    oldRolOfListaTokensToken = em.merge(oldRolOfListaTokensToken);
+                }
+            }
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -54,7 +75,34 @@ public class RolJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Rol persistentRol = em.find(Rol.class, rol.getId());
+            ArrayList<Token> listaTokensOld = persistentRol.getListaTokens();
+            ArrayList<Token> listaTokensNew = rol.getListaTokens();
+            ArrayList<Token> attachedListaTokensNew = new ArrayList<Token>();
+            for (Token listaTokensNewTokenToAttach : listaTokensNew) {
+                listaTokensNewTokenToAttach = em.getReference(listaTokensNewTokenToAttach.getClass(), listaTokensNewTokenToAttach.getId());
+                attachedListaTokensNew.add(listaTokensNewTokenToAttach);
+            }
+            listaTokensNew = attachedListaTokensNew;
+            rol.setListaTokens(listaTokensNew);
             rol = em.merge(rol);
+            for (Token listaTokensOldToken : listaTokensOld) {
+                if (!listaTokensNew.contains(listaTokensOldToken)) {
+                    listaTokensOldToken.setRol(null);
+                    listaTokensOldToken = em.merge(listaTokensOldToken);
+                }
+            }
+            for (Token listaTokensNewToken : listaTokensNew) {
+                if (!listaTokensOld.contains(listaTokensNewToken)) {
+                    Rol oldRolOfListaTokensNewToken = listaTokensNewToken.getRol();
+                    listaTokensNewToken.setRol(rol);
+                    listaTokensNewToken = em.merge(listaTokensNewToken);
+                    if (oldRolOfListaTokensNewToken != null && !oldRolOfListaTokensNewToken.equals(rol)) {
+                        oldRolOfListaTokensNewToken.getListaTokens().remove(listaTokensNewToken);
+                        oldRolOfListaTokensNewToken = em.merge(oldRolOfListaTokensNewToken);
+                    }
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -83,6 +131,11 @@ public class RolJpaController implements Serializable {
                 rol.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The rol with id " + id + " no longer exists.", enfe);
+            }
+            ArrayList<Token> listaTokens = rol.getListaTokens();
+            for (Token listaTokensToken : listaTokens) {
+                listaTokensToken.setRol(null);
+                listaTokensToken = em.merge(listaTokensToken);
             }
             em.remove(rol);
             em.getTransaction().commit();

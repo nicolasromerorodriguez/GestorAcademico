@@ -30,6 +30,7 @@ public class SuperUsuarioJpaController implements Serializable {
     public SuperUsuarioJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {

@@ -27,24 +27,30 @@ public class Estudiante implements Serializable {
     private String codigo;
     @OneToOne
     private HistoriaAcademica historiaAcademica;
+    @ManyToOne
+    private Curso cursoEstudiante;
     private String primerNombre;
     private String segundoNombre;
     private String primerApellido;
     private String segundoApellido;
+   @OneToOne
+    private Observador observador;
 
     public Estudiante() {
     }
 
-    public Estudiante(int id, Acudiente acudiente, boolean aceptado, String codigo, HistoriaAcademica historiaAcademica, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido) {
+    public Estudiante(int id, Acudiente acudienteEstudiante, boolean aceptado, String codigo, HistoriaAcademica historiaAcademica, Curso cursoEstudiante, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido, Observador observador) {
         this.id = id;
-        this.acudienteEstudiante = acudiente;
+        this.acudienteEstudiante = acudienteEstudiante;
         this.aceptado = aceptado;
         this.codigo = codigo;
         this.historiaAcademica = historiaAcademica;
+        this.cursoEstudiante = cursoEstudiante;
         this.primerNombre = primerNombre;
         this.segundoNombre = segundoNombre;
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
+        this.observador = observador;
     }
 
     public int getId() {
@@ -87,6 +93,14 @@ public class Estudiante implements Serializable {
         this.historiaAcademica = historiaAcademica;
     }
 
+    public Curso getCursoEstudiante() {
+        return cursoEstudiante;
+    }
+
+    public void setCursoEstudiante(Curso cursoEstudiante) {
+        this.cursoEstudiante = cursoEstudiante;
+    }
+
     public String getPrimerNombre() {
         return primerNombre;
     }
@@ -119,6 +133,14 @@ public class Estudiante implements Serializable {
         this.segundoApellido = segundoApellido;
     }
 
+    public Observador getObservador() {
+        return observador;
+    }
+
+    public void setObservador(Observador observador) {
+        this.observador = observador;
+    }
+
     public void add(Estudiante estudiante) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
@@ -126,6 +148,7 @@ public class Estudiante implements Serializable {
     public void remove(Estudiante estudiante) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
     
     
     

@@ -10,8 +10,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Modelo.Acudiente;
-import Modelo.Estudiante;
 import Modelo.HistoriaAcademica;
+import Modelo.Curso;
+import Modelo.Estudiante;
 import Persistencia.exceptions.NonexistentEntityException;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -27,10 +28,10 @@ public class EstudianteJpaController implements Serializable {
     public EstudianteJpaController(EntityManagerFactory emf) {
         this.emf = emf;
     }
-    
     public EstudianteJpaController(){
         emf = Persistence.createEntityManagerFactory("Colegio1PU");
     }
+
     private EntityManagerFactory emf = null;
 
     public EntityManager getEntityManager() {
@@ -52,6 +53,11 @@ public class EstudianteJpaController implements Serializable {
                 historiaAcademica = em.getReference(historiaAcademica.getClass(), historiaAcademica.getId());
                 estudiante.setHistoriaAcademica(historiaAcademica);
             }
+            Curso cursoEstudiante = estudiante.getCursoEstudiante();
+            if (cursoEstudiante != null) {
+                cursoEstudiante = em.getReference(cursoEstudiante.getClass(), cursoEstudiante.getId());
+                estudiante.setCursoEstudiante(cursoEstudiante);
+            }
             em.persist(estudiante);
             if (acudienteEstudiante != null) {
                 acudienteEstudiante.getListaEstudiantes().add(estudiante);
@@ -60,6 +66,10 @@ public class EstudianteJpaController implements Serializable {
             if (historiaAcademica != null) {
                 historiaAcademica.getEstudiante().add(estudiante);
                 historiaAcademica = em.merge(historiaAcademica);
+            }
+            if (cursoEstudiante != null) {
+                cursoEstudiante.getListaEstudiantes().add(estudiante);
+                cursoEstudiante = em.merge(cursoEstudiante);
             }
             em.getTransaction().commit();
         } finally {
@@ -79,6 +89,8 @@ public class EstudianteJpaController implements Serializable {
             Acudiente acudienteEstudianteNew = estudiante.getAcudienteEstudiante();
             HistoriaAcademica historiaAcademicaOld = persistentEstudiante.getHistoriaAcademica();
             HistoriaAcademica historiaAcademicaNew = estudiante.getHistoriaAcademica();
+            Curso cursoEstudianteOld = persistentEstudiante.getCursoEstudiante();
+            Curso cursoEstudianteNew = estudiante.getCursoEstudiante();
             if (acudienteEstudianteNew != null) {
                 acudienteEstudianteNew = em.getReference(acudienteEstudianteNew.getClass(), acudienteEstudianteNew.getId());
                 estudiante.setAcudienteEstudiante(acudienteEstudianteNew);
@@ -86,6 +98,10 @@ public class EstudianteJpaController implements Serializable {
             if (historiaAcademicaNew != null) {
                 historiaAcademicaNew = em.getReference(historiaAcademicaNew.getClass(), historiaAcademicaNew.getId());
                 estudiante.setHistoriaAcademica(historiaAcademicaNew);
+            }
+            if (cursoEstudianteNew != null) {
+                cursoEstudianteNew = em.getReference(cursoEstudianteNew.getClass(), cursoEstudianteNew.getId());
+                estudiante.setCursoEstudiante(cursoEstudianteNew);
             }
             estudiante = em.merge(estudiante);
             if (acudienteEstudianteOld != null && !acudienteEstudianteOld.equals(acudienteEstudianteNew)) {
@@ -103,6 +119,14 @@ public class EstudianteJpaController implements Serializable {
             if (historiaAcademicaNew != null && !historiaAcademicaNew.equals(historiaAcademicaOld)) {
                 historiaAcademicaNew.getEstudiante().add(estudiante);
                 historiaAcademicaNew = em.merge(historiaAcademicaNew);
+            }
+            if (cursoEstudianteOld != null && !cursoEstudianteOld.equals(cursoEstudianteNew)) {
+                cursoEstudianteOld.getListaEstudiantes().remove(estudiante);
+                cursoEstudianteOld = em.merge(cursoEstudianteOld);
+            }
+            if (cursoEstudianteNew != null && !cursoEstudianteNew.equals(cursoEstudianteOld)) {
+                cursoEstudianteNew.getListaEstudiantes().add(estudiante);
+                cursoEstudianteNew = em.merge(cursoEstudianteNew);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -142,6 +166,11 @@ public class EstudianteJpaController implements Serializable {
             if (historiaAcademica != null) {
                 historiaAcademica.getEstudiante().remove(estudiante);
                 historiaAcademica = em.merge(historiaAcademica);
+            }
+            Curso cursoEstudiante = estudiante.getCursoEstudiante();
+            if (cursoEstudiante != null) {
+                cursoEstudiante.getListaEstudiantes().remove(estudiante);
+                cursoEstudiante = em.merge(cursoEstudiante);
             }
             em.remove(estudiante);
             em.getTransaction().commit();

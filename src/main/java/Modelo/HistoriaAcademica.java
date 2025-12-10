@@ -5,10 +5,12 @@
 package Modelo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -20,15 +22,16 @@ public class HistoriaAcademica implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private Estudiante estudiante;
-    private String boletines;
+    @OneToMany (mappedBy = "historiaAcademica")
+    private ArrayList<Boletin> listaBoletines;
 
-    public HistoriaAcademica() {
-    }
-
-    public HistoriaAcademica(int id, Estudiante estudiante, String boletines) {
+    public HistoriaAcademica(int id, Estudiante estudiante, ArrayList<Boletin> listaBoletines) {
         this.id = id;
         this.estudiante = estudiante;
-        this.boletines = boletines;
+        this.listaBoletines = listaBoletines;
+    }
+
+    public HistoriaAcademica() {
     }
 
     public int getId() {
@@ -47,13 +50,16 @@ public class HistoriaAcademica implements Serializable {
         this.estudiante = estudiante;
     }
 
-    public String getBoletines() {
-        return boletines;
+    public ArrayList<Boletin> getListaBoletines() {
+        return listaBoletines;
     }
 
-    public void setBoletines(String boletines) {
-        this.boletines = boletines;
+    public void setListaBoletines(ArrayList<Boletin> listaBoletines) {
+        this.listaBoletines = listaBoletines;
     }
+
+    
+    
     
     
     
