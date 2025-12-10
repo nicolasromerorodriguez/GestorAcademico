@@ -28,10 +28,10 @@ public class Colegio1 {
         
        
 
-        // Luego creas la vista y le pasas la controladora:
+      
         PaginaInicio inicio = new PaginaInicio(control);
 
-        // Muestras la ventana:
+        
         inicio.setVisible(true);
     
         
@@ -71,8 +71,7 @@ public class Colegio1 {
         
         
         // crear lista de tokens
-        ArrayList<Token> listaTokens = new ArrayList<Token>();
-        
+    
         
         
         //crear roles con lista de roles
