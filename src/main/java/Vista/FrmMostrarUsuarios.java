@@ -221,7 +221,7 @@ public class FrmMostrarUsuarios extends javax.swing.JFrame {
     }
 
     private void volverMenu() {
-        FrmSuperUsuarioInicio frm = new FrmSuperUsuarioInicio();
+        FrmSuperUsuarioInicio frm = new FrmSuperUsuarioInicio(control);
         frm.setVisible(true);
         this.dispose();
     }

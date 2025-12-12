@@ -117,6 +117,16 @@ public class PaginaInicio extends JFrame {
     private void abrirVentanaPorRol(int rol, Token token) {
 
     switch (rol) {
+        
+        case 1: ListaGradosVista vistaAdmin = new ListaGradosVista(control);
+            vistaAdmin.setVisible(true);
+            break;
+            
+        
+        case 3: 
+            FrmSuperUsuarioInicio vistaSuper = new FrmSuperUsuarioInicio(control);
+            vistaSuper.setVisible(true);
+            break;
         case 2:  // Suponiendo que el rol 2 = PROFESOR
             Profesor profesor = control.obtenerProfesorPorToken(token);
 

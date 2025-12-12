@@ -8,11 +8,12 @@ package Vista;
  *
  * @author nicol
  */
+import Controlador.Controladora;
 import javax.swing.*;
 
 public class FrmSuperUsuarioInicio extends JFrame {
 
-    public FrmSuperUsuarioInicio() {
+    public FrmSuperUsuarioInicio(Controladora control) {
 
         setTitle("Panel Super Usuario");
         setSize(400, 200);
@@ -37,7 +38,5 @@ public class FrmSuperUsuarioInicio extends JFrame {
         btnSalir.addActionListener(e -> dispose());
     }
 
-    public static void main(String[] args) {
-        new FrmSuperUsuarioInicio().setVisible(true);
-    }
+    
 }

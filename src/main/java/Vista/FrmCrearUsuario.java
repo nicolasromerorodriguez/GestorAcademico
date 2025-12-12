@@ -68,7 +68,7 @@ public class FrmCrearUsuario extends JFrame {
     }
 
     private void cancelar() {
-        new FrmSuperUsuarioInicio().setVisible(true);
+        new FrmSuperUsuarioInicio(control).setVisible(true);
         dispose();
     }
 
@@ -99,7 +99,7 @@ public class FrmCrearUsuario extends JFrame {
 
         // Si todo fue bien se vuelve al inicio
         if (resultado.contains("éxito")) {
-            new FrmSuperUsuarioInicio().setVisible(true);
+            new FrmSuperUsuarioInicio(control).setVisible(true);
             dispose();
         }
     }
