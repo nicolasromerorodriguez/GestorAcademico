@@ -11,6 +11,7 @@ import Modelo.Usuario;
 import Persistencia.ControladoraPersistencia;
 import Vista.FrmMostrarUsuarios;
 import Vista.FrmSuperUsuarioInicio;
+import Vista.ListaGradosVista;
 import Vista.PaginaInicio;
 import java.util.ArrayList;
 import javax.swing.SwingUtilities;
@@ -27,12 +28,12 @@ public class Colegio1 {
         Controladora control = new Controladora();
         
        
-
+            new ListaGradosVista(control);
       
-        PaginaInicio inicio = new PaginaInicio(control);
+        //PaginaInicio inicio = new PaginaInicio(control);
 
         
-        inicio.setVisible(true);
+        //inicio.setVisible(true);
     
         
         //Token token = new Token("1", "Usuario1", "Administracion", "12345");

@@ -38,6 +38,9 @@ public class CursoJpaController implements Serializable {
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
+    
+   
+    
 
     public void create(Curso curso) {
         if (curso.getListaEstudiantes() == null) {
@@ -259,5 +262,17 @@ public class CursoJpaController implements Serializable {
             em.close();
         }
     }
+    public List<Curso> findCursosByGrado(int idGrado) {
+    EntityManager em = getEntityManager();
+    try {
+        return em.createQuery("SELECT c FROM Curso c WHERE c.grado.id = :idGrado", Curso.class)
+                 .setParameter("idGrado", idGrado)
+                 .getResultList();
+    } finally {
+        em.close();
+    }
+}
+
+    
     
 }

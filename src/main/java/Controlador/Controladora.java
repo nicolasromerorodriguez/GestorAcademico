@@ -6,6 +6,10 @@ package Controlador;
 
 import Modelo.Acudiente;
 import Modelo.Direccion;
+import Modelo.Grado;
+import Modelo.Curso;
+import Modelo.Estudiante;
+import Modelo.Logro;
 import Modelo.Preinscripcion;
 import Modelo.Profesor;
 import Modelo.Rol;
@@ -186,7 +190,75 @@ public void crearPreinscripcion(Preinscripcion pre){
     controlPersis.crearPreinscripcion(pre);
 }
 
+//-----------------------------------------------------------Grados--------------------------------
 
+public List<Grado> obtenerTodosLosGrados() {
+    return controlPersis.traerGrados();
+}
+
+public List<Curso> obtenerCursosPorGrado(int idGrado) {
+    return controlPersis.traerCursosPorGrado(idGrado);
+}
+
+public void crearCurso(Curso curso) {
+    controlPersis.crearCurso(curso);
+}
+
+public void editarProfesor(Profesor profesor) {
+    controlPersis.editarProfesor(profesor);
+}
+
+public void editarEstudiante(Estudiante est) {
+    controlPersis.editarEstudiante(est);
+}
+
+public Profesor obtenerProfesorSinCurso() {
+    return controlPersis.obtenerProfesorSinCurso();
+}
+
+public List<Estudiante> obtenerEstudiantesSinCurso() {
+    return controlPersis.obtenerEstudiantesSinCurso();
+}
+
+public Estudiante buscarEstudiante(String nombre) {
+    return controlPersis.buscarEstudiante(nombre);
+}
+
+
+
+public String asignarEstudianteACurso(int idEstudiante, int idCurso) {
+    try {
+        Estudiante e = controlPersis.traerEstudiante(idEstudiante);
+        if (e == null) return "Error: estudiante no existe";
+
+        if (e.getCursoEstudiante() != null)
+            return "El estudiante ya tiene un curso asignado";
+
+        Curso c = controlPersis.traerCurso(idCurso);
+        if (c == null) return "Error: curso no existe";
+
+        // asignación
+        e.setCursoEstudiante(c);
+        controlPersis.editarEstudiante(e);
+
+        return "Estudiante asignado correctamente al curso " + c.getNombre();
+
+    } catch (Exception ex) {
+        return "Error de conexión a la base de datos";
+    }
+}
+public Curso obtenerCurso(int id) {
+    return controlPersis.traerCurso(id);
+}
+
+
+public void eliminarLogro(Logro logro) {
+    controlPersis.eliminarLogro(logro);
+}
+
+public Profesor obtenerProfesorPorToken(Token tok) {
+    return controlPersis.obtenerProfesorPorToken(tok);
+}
 
 
 }

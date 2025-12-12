@@ -5,7 +5,11 @@
 package Persistencia;
 
 import Modelo.Acudiente;
+import Modelo.Curso;
 import Modelo.Direccion;
+import Modelo.Estudiante;
+import Modelo.Grado;
+import Modelo.Logro;
 import Modelo.Preinscripcion;
 import Modelo.Profesor;
 import Modelo.Rol;
@@ -18,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -39,6 +44,12 @@ public class ControladoraPersistencia {
     
     EstudianteJpaController estudianteJpa = new EstudianteJpaController();
     HistoriaAcademicaJpaController historiaJpa = new HistoriaAcademicaJpaController();
+    
+    GradoJpaController gradoJpa = new GradoJpaController();
+    CursoJpaController cursoJpa = new CursoJpaController();
+    
+    LogroJpaController logroJpa = new LogroJpaController();
+    
 
     public void crearToken(Token token) {
         try {
@@ -270,5 +281,96 @@ public void crearPreinscripcion(Preinscripcion pre) {
         throw new RuntimeException("Error guardando Preinscripción en la BD", e);
     }
 }
+
+
+
+
+///-----------------------------Admin-------------------------
+
+public List<Grado> traerGrados() {
+    return gradoJpa.findGradoEntities();
+}
+
+public List<Curso> traerCursosPorGrado(int idGrado) {
+    return cursoJpa.findCursosByGrado(idGrado);
+}
+
+
+public void crearCurso(Curso curso) {
+    cursoJpa.create(curso);
+}
+
+public void editarProfesor(Profesor profesor) {
+    try {
+        profesorJpa.edit(profesor);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+public void editarEstudiante(Estudiante est) {
+    try {
+        estudianteJpa.edit(est);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+public Profesor obtenerProfesorSinCurso() {
+    return profesorJpa.obtenerProfesorSinCurso();
+}
+
+public List<Estudiante> obtenerEstudiantesSinCurso() {
+    return estudianteJpa.obtenerEstudiantesSinCurso();
+}
+
+public List<Curso> obtenerCursosPorGrado(int idGrado) {
+    return cursoJpa.findCursosByGrado(idGrado);
+}
+
+public Estudiante traerEstudiante(int id) {
+    try {
+        return estudianteJpa.findEstudiante(id);
+    } catch (Exception e) {
+        throw new RuntimeException("Error trayendo estudiante", e);
+    }
+}
+
+public Curso traerCurso(int idCurso) {
+    try {
+        return cursoJpa.findCurso(idCurso);
+    } catch (Exception e) {
+        throw new RuntimeException("Error trayendo curso", e);
+    }
+}
+
+
+
+/** Busca y devuelve la primera coincidencia (o null) */
+public Estudiante buscarEstudiante(String termino) {
+    try {
+        List<Estudiante> res = estudianteJpa.buscarPorNombreOcodigo(termino);
+        return (res == null || res.isEmpty()) ? null : res.get(0);
+    } catch (Exception e) {
+        throw new RuntimeException("Error buscando estudiante", e);
+    }
+}
+
+public void eliminarLogro(Logro logro) {
+    try {
+        logroJpa.destroy(logro.getId());
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error eliminando el logro en la BD", e);
+    }
+}
+
+
+public Profesor obtenerProfesorPorToken(Token tok) {
+    return profesorJpa.buscarPorToken(tok);
+}
+
+
+
 
 }

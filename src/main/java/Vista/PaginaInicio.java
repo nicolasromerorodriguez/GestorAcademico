@@ -7,6 +7,8 @@ package Vista;
 import javax.swing.*;
 import java.awt.*;
 import Controlador.Controladora;
+import Modelo.Curso;
+import Modelo.Profesor;
 import Modelo.Token;
 
 public class PaginaInicio extends JFrame {
@@ -98,7 +100,7 @@ public class PaginaInicio extends JFrame {
         }
 
         JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso");
-        abrirVentanaPrincipal();
+        abrirVentanaPorRol(rolSeleccionado, token);
         this.dispose();
     }
 
@@ -111,6 +113,40 @@ public class PaginaInicio extends JFrame {
         ventana.add(new JLabel("Sesión iniciada correctamente", SwingConstants.CENTER));
         ventana.setVisible(true);
     }
+    
+    private void abrirVentanaPorRol(int rol, Token token) {
+
+    switch (rol) {
+        case 2:  // Suponiendo que el rol 2 = PROFESOR
+            Profesor profesor = control.obtenerProfesorPorToken(token);
+
+            if (profesor == null) {
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo cargar la información del profesor.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Curso curso = profesor.getCurso();
+
+            if (curso == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Este profesor no tiene un curso asignado.",
+                        "Sin curso",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Abrir la vista del profesor
+            new ProfesorCursoVista(control, profesor, curso).setVisible(true);
+            break;
+
+        default:
+            abrirVentanaPrincipal();
+    }
+}
+
 
     private void abrirFormularioPreinscripcion() {
         FormularioPreinscripcion form = new FormularioPreinscripcion(control);

@@ -16,6 +16,7 @@ public class Profesor extends Usuario {
     @OneToOne
     private Curso curso;
 
+
     public Profesor(String id, String codigo, String correo, boolean estado, String primernombre, String segundoNombre, String primerApellido, String segundoApellido, String telefono, Token token) {
         super(id, codigo, correo, estado, primernombre, segundoNombre, primerApellido, segundoApellido, telefono, token);
     }

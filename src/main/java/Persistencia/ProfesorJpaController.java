@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import Modelo.Curso;
 import Modelo.Profesor;
+import Modelo.Token;
 import Persistencia.exceptions.NonexistentEntityException;
 import Persistencia.exceptions.PreexistingEntityException;
 import java.util.List;
@@ -175,5 +176,37 @@ public class ProfesorJpaController implements Serializable {
             em.close();
         }
     }
+    
+    
+    public Profesor obtenerProfesorSinCurso() {
+    EntityManager em = getEntityManager();
+    try {
+        List<Profesor> lista = em.createQuery(
+            "SELECT p FROM Profesor p WHERE p.curso IS NULL",
+            Profesor.class
+        ).setMaxResults(1)
+        .getResultList();
+
+        if (lista.isEmpty()) {
+            return null;
+        }
+        return lista.get(0);
+    } finally {
+        em.close();
+    }
+}
+
+    public Profesor buscarPorToken(Token tok) {
+        EntityManager em = getEntityManager();
+    try {
+        return em.createQuery(
+                "SELECT p FROM Profesor p WHERE p.token = :token", Profesor.class)
+                .setParameter("token", tok)
+                .getSingleResult();
+    } catch (Exception e) {
+        return null;
+    }
+}
+
     
 }

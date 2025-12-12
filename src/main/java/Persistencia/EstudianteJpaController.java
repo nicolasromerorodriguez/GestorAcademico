@@ -14,10 +14,12 @@ import Modelo.HistoriaAcademica;
 import Modelo.Curso;
 import Modelo.Estudiante;
 import Persistencia.exceptions.NonexistentEntityException;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -226,5 +228,55 @@ public class EstudianteJpaController implements Serializable {
             em.close();
         }
     }
+    
+    
+    public List<Estudiante> obtenerEstudiantesSinCurso() {
+    EntityManager em = getEntityManager();
+    try {
+        List<Estudiante> res = em.createQuery(
+                "SELECT e FROM Estudiante e WHERE e.cursoEstudiante IS NULL",
+                Estudiante.class
+        ).getResultList();
+
+        if (res == null)
+            return Collections.emptyList();
+
+        return res;
+
+    } finally {
+        em.close();
+    }
+}
+
+
+
+
+public List<Estudiante> findEstudiantesSinCurso() {
+    EntityManager em = getEntityManager();
+    try {
+        TypedQuery<Estudiante> q = em.createQuery(
+            "SELECT e FROM Estudiante e WHERE e.cursoEstudiante IS NULL", Estudiante.class);
+        return q.getResultList();
+    } finally {
+        if (em != null) em.close();
+    }
+}
+
+/**
+ * Busca estudiantes por nombre o por código (búsqueda parcial).
+ * Retorna lista (puedes tomar el primero desde la capa superior).
+ */
+public List<Estudiante> buscarPorNombreOcodigo(String termino) {
+    EntityManager em = getEntityManager();
+    try {
+        TypedQuery<Estudiante> q = em.createQuery(
+            "SELECT e FROM Estudiante e WHERE e.primerNombre ILIKE :t OR e.codigo ILIKE :t", Estudiante.class);
+        q.setParameter("t", "%" + termino + "%");
+        return q.getResultList();
+    } finally {
+        if (em != null) em.close();
+    }
+}
+
     
 }

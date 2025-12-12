@@ -15,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -29,6 +30,7 @@ public class Curso implements Serializable {
     private boolean estado;
     private String nombre;
     private Profesor profesor;
+
     @ManyToOne
     private Grado grado;
     @OneToMany (mappedBy = "cursoEstudiante")
